@@ -54,6 +54,6 @@ void formatOutput(file_type type, char* input_file_name, char* output_file_name)
     file.open(input_file_name, std::ios::in|std::ios::binary);
 
     for(int i = 0; i < file.tellg() / 4; i++){
-
+        
     }
 }

@@ -2,7 +2,7 @@
 
 turns raw RV32ima machine code into readable assembly code.
 
-## how to run
+## How to test
 
 windows with mingw:
 
