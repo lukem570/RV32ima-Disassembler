@@ -14,6 +14,6 @@ linux (I work on windows so idk if this will build correctly):
 
 ## TODO:
 
-get params
-put data in a readable format (txt or like csv)
+
+add csv
 add the reg conventions

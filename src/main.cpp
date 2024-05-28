@@ -14,15 +14,17 @@ enum class file_type {
     CSV,
 };
 
-int formatOutput(file_type, char*, char*);
+int formatOutput(file_type, char*, char*, bool, bool);
 
 int main(int argc, char *argv[]){
 
     char *input_file_name;
     char *output_file_name;
-    file_type type; //defaults to txt
+    file_type type; // defaults to txt
+    bool big_endian = false;
+    bool log = false;
 
-    //gets parameters
+    // gets parameters
     for(int i = 0; i < argc; i++){
         if (argv[i][0] == '-'){
             switch (argv[i][1]){
@@ -37,6 +39,8 @@ int main(int argc, char *argv[]){
                     printf("invalid type\n");
                     return -1;
                 } break;
+            case 'b': big_endian = true; 
+            case 'l': log = true;
             }
         }
     }
@@ -46,17 +50,24 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
-    return formatOutput(type, input_file_name, output_file_name);
+    delete argv;
+    return formatOutput(type, input_file_name, output_file_name, big_endian, log); // adding a class for this might be ideal
 }
 
-int formatOutput(file_type type, char* input_file_name, char* output_file_name){
+int formatOutput(file_type type, char* input_file_name, char* output_file_name, bool big_endian, bool log){
 
     ifstream file;
+    ofstream output(strcat(output_file_name, type == file_type::TXT ? ".txt" : ".csv"));
 
     file.open(input_file_name, ios::in|ios::binary);
 
     if(!file.is_open()){
         printf("error loading file");
+        return -1;
+    }
+
+    if(!output.is_open()){
+        printf("error creating file");
         return -1;
     }
 
@@ -67,23 +78,42 @@ int formatOutput(file_type type, char* input_file_name, char* output_file_name){
 
     file.seekg(0, ios::beg);
 
-    //this kinda seems slow
+    // seems slow to add to the file each time and to read each time although i dont feel like implementing another way
     for(int i = 0; i < file_size; i += 0x4){
         file.read((char*)&instruction, sizeof(int));
 
-        //manual conversion from little endian to big endian
-        instruction = ((instruction >> 24) & 0xff) |
-              ((instruction << 8) & 0xff0000) |
-              ((instruction >> 8) & 0xff00) |
-              ((instruction << 24) & 0xff000000);
-
+        // manual conversion from little endian to big endian
+        if(big_endian){
+            instruction = ((instruction >> 24) & 0xff) |
+                ((instruction << 8) & 0xff0000) |
+                ((instruction >> 8) & 0xff00) |
+                ((instruction << 24) & 0xff000000);
+        }
+        
         stringstream line;
-        line << "0x" << setfill('0') << setw(8) << hex << i << "   " << decodeInstruction(instruction).c_str();
 
-        printf("%s\n", line.str().c_str());
+        if(type == file_type::TXT){
+            line 
+                << "0x" << setfill('0') << setw(8) << hex << i << "   " 
+                << dec << setfill(' ') << setw(8) << decodeInstruction(instruction).c_str()
+                << setfill(' ') << setw(3) << ((instruction >> 7) & 0b11111)
+                << setfill(' ') << setw(3) << ((instruction >> 15) & 0b11111)
+                << setfill(' ') << setw(3) << ((instruction >> 20) & 0b11111)
+                << endl;
+        } else if (type == file_type::CSV){
+
+        }
+        
+        output << line.str();
+
+        if (log){
+            printf("%s", line.str().c_str());
+        }
     }
 
     file.close();
+    output.close();
 
+    delete input_file_name, output_file_name;
     return 0;
 }
