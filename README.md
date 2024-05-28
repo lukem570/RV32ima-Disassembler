@@ -14,6 +14,6 @@ linux (I work on windows so idk if this will build correctly):
 
 ## TODO:
 
-
 add csv
+
 add the reg conventions

@@ -54,6 +54,14 @@ int main(int argc, char *argv[]){
     return formatOutput(type, input_file_name, output_file_name, big_endian, log); // adding a class for this might be ideal
 }
 
+int32_t sign_extend_to_32(int value, int num_bits) {
+    int32_t sign_extend_mask = (1 << (num_bits - 1)) - 1;
+    if (value & (1 << (num_bits - 1))) {
+        sign_extend_mask |= ~((1 << num_bits) - 1);
+    }
+    return (int32_t)(value | sign_extend_mask);
+}
+
 int formatOutput(file_type type, char* input_file_name, char* output_file_name, bool big_endian, bool log){
 
     ifstream file;
@@ -93,12 +101,17 @@ int formatOutput(file_type type, char* input_file_name, char* output_file_name, 
         stringstream line;
 
         if(type == file_type::TXT){
-            line 
+            line
+                << setfill('0') << setw(8) << i << "  " 
                 << "0x" << setfill('0') << setw(8) << hex << i << "   " 
                 << dec << setfill(' ') << setw(8) << decodeInstruction(instruction).c_str()
-                << setfill(' ') << setw(3) << ((instruction >> 7) & 0b11111)
+                << setfill(' ') << setw(5) << ((instruction >> 7) & 0b11111)
                 << setfill(' ') << setw(3) << ((instruction >> 15) & 0b11111)
                 << setfill(' ') << setw(3) << ((instruction >> 20) & 0b11111)
+                << setfill(' ') << setw(10) << sign_extend_to_32((instruction >> 20), 12) //i type imm
+                << setfill(' ') << setw(10) << sign_extend_to_32(((instruction >> 25) & 0b111111111111 << 7) | ((instruction >> 7) & 0b11111), 12) //s type imm
+                << setfill(' ') << setw(10) << sign_extend_to_32((((instruction >> 31) & 0b1 << 12) | ((instruction >> 7) & 0b1 << 11) | ((instruction >> 25) & 0b11111111111 << 7) | ((instruction >> 8) & 0b1111)) << 1, 13) //b type imm
+                << setfill(' ') << setw(10) << ((instruction >> 12) & 0xFFFFF) << 12 //u type imm
                 << endl;
         } else if (type == file_type::CSV){
 
