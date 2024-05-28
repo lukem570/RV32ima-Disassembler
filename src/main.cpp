@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <cstring>
 #include <fstream>
+#include <cstdint>
+#include <sstream>
+#include <iomanip>
 
 #include "instruction-decoder.hpp"
 
@@ -50,7 +53,7 @@ int formatOutput(file_type type, char* input_file_name, char* output_file_name){
 
     ifstream file;
 
-    file.open("test/fibSeq.bin", std::ios::in|std::ios::binary);
+    file.open(input_file_name, ios::in|ios::binary);
 
     if(!file.is_open()){
         printf("error loading file");
@@ -64,11 +67,20 @@ int formatOutput(file_type type, char* input_file_name, char* output_file_name){
 
     file.seekg(0, ios::beg);
 
-    printf("%i\n", file_size);
-
-    for(int i = 0; i < file_size; i += 4){
+    //this kinda seems slow
+    for(int i = 0; i < file_size; i += 0x4){
         file.read((char*)&instruction, sizeof(int));
-        printf("%x\n", instruction);
+
+        //manual conversion from little endian to big endian
+        instruction = ((instruction >> 24) & 0xff) |
+              ((instruction << 8) & 0xff0000) |
+              ((instruction >> 8) & 0xff00) |
+              ((instruction << 24) & 0xff000000);
+
+        stringstream line;
+        line << "0x" << setfill('0') << setw(8) << hex << i << "   " << decodeInstruction(instruction).c_str();
+
+        printf("%s\n", line.str().c_str());
     }
 
     file.close();

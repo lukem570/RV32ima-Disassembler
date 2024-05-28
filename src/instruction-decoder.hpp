@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <stdio.h>
 using namespace std;
 //kinda trading size for readability in this file
 
@@ -110,7 +111,7 @@ string decodeInstruction(uint32_t instruction){
     case opcode::JAL: return "JAL";
     case opcode::JALR: return "JALR";
     case opcode::BRANCH: {
-        branch_func branch = (branch_func)(instruction & 0b111000000000000);
+        branch_func branch = (branch_func)((instruction & 0b111000000000000) >> 12);
         switch (branch){
         case branch_func::BEQ: return "BEQ";
         case branch_func::BNE: return "BNE";
@@ -122,7 +123,7 @@ string decodeInstruction(uint32_t instruction){
         }
     }
     case opcode::LOAD:{
-        load_func load = (load_func)(instruction & 0b111000000000000);
+        load_func load = (load_func)((instruction & 0b111000000000000) >> 12);
         switch (load){
         case load_func::LB: return "LB";
         case load_func::LH: return "LH";
@@ -133,7 +134,7 @@ string decodeInstruction(uint32_t instruction){
         }
     }
     case opcode::STORE:{
-        store_func store = (store_func)(instruction & 0b111000000000000);
+        store_func store = (store_func)((instruction & 0b111000000000000) >> 12);
         switch (store){
         case store_func::SB: return "SB";
         case store_func::SH: return "SH";
@@ -142,7 +143,7 @@ string decodeInstruction(uint32_t instruction){
         }
     }
     case opcode::IMMEDIATE:{
-        immediate_func immediate = (immediate_func)(instruction & 0b111000000000000);
+        immediate_func immediate = (immediate_func)((instruction & 0b111000000000000) >> 12);
         switch (immediate){
         case immediate_func::ADDI: return "ADDI";
         case immediate_func::SLTI: return "SLTI";
@@ -156,7 +157,7 @@ string decodeInstruction(uint32_t instruction){
         }
     }
     case opcode::ARITHMETIC:{
-        arithmetic_func arithmetic = (arithmetic_func)(instruction & 0b111000000000000);
+        arithmetic_func arithmetic = (arithmetic_func)((instruction & 0b111000000000000) >> 12);
         if(instruction & 0x02000000){ //RV32M
             switch (arithmetic){
             case arithmetic_func::MUL: return "MUL";
@@ -184,7 +185,7 @@ string decodeInstruction(uint32_t instruction){
         }
     }
     case opcode::FENCE:{
-        fence_func fence = (fence_func)(instruction & 0b111000000000000);
+        fence_func fence = (fence_func)((instruction & 0b111000000000000) >> 12);
         switch (fence){
         case fence_func::FENCE: return "FENCE";
         case fence_func::FENCEI: return "FENCE.I";
@@ -192,7 +193,7 @@ string decodeInstruction(uint32_t instruction){
         }
     }
     case opcode::SYSTEM:{
-        system_func system = (system_func)(instruction & 0b111000000000000);
+        system_func system = (system_func)((instruction & 0b111000000000000) >> 12);
         switch (system){
         case system_func::ECALL: return (instruction & 0x40000000) ? "EBREAK" : "ECALL";
         case system_func::CSRRW: return "CSRRW";
@@ -205,7 +206,7 @@ string decodeInstruction(uint32_t instruction){
         }
     }
     case opcode::ATOMIC:{
-        atomic_func atomic = (atomic_func)(instruction & 0xf8000000);
+        atomic_func atomic = (atomic_func)((instruction & 0xf8000000) >> 27);
         switch (atomic){
         case atomic_func::LR: return "LR.W";
         case atomic_func::SC: return "SC.W";
