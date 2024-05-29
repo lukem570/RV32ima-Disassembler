@@ -8,7 +8,7 @@ windows with mingw:
 
 `mingw32-make build-test`
 
-linux (I work on windows so idk if this will build correctly):
+linux:
 
 `make build-test`
 

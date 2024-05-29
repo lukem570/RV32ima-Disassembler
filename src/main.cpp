@@ -108,10 +108,8 @@ int formatOutput(file_type type, char* input_file_name, char* output_file_name, 
                 << setfill(' ') << setw(5) << ((instruction >> 7) & 0b11111)
                 << setfill(' ') << setw(3) << ((instruction >> 15) & 0b11111)
                 << setfill(' ') << setw(3) << ((instruction >> 20) & 0b11111)
-                << setfill(' ') << setw(10) << sign_extend_to_32((instruction >> 20), 12) //i type imm
-                << setfill(' ') << setw(10) << sign_extend_to_32(((instruction >> 25) & 0b111111111111 << 7) | ((instruction >> 7) & 0b11111), 12) //s type imm
-                << setfill(' ') << setw(10) << sign_extend_to_32((((instruction >> 31) & 0b1 << 12) | ((instruction >> 7) & 0b1 << 11) | ((instruction >> 25) & 0b11111111111 << 7) | ((instruction >> 8) & 0b1111)) << 1, 13) //b type imm
-                << setfill(' ') << setw(10) << ((instruction >> 12) & 0xFFFFF) << 12 //u type imm
+                << "   "
+                << hex << setfill('0') << setw(8) << instruction //base instruction
                 << endl;
         } else if (type == file_type::CSV){
 
