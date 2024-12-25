@@ -50,7 +50,6 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
-    delete argv;
     return formatOutput(type, input_file_name, output_file_name, big_endian, log); // adding a class for this might be ideal
 }
 

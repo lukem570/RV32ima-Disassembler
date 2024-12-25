@@ -34,12 +34,17 @@ enum class load_func {
     LW           = 0b010,
     LBU          = 0b100,
     LHU          = 0b101,
+
+    LWU          = 0b110,
+    LD           = 0b011,
 };
 
 enum class store_func {
     SB           = 0b000,
     SH           = 0b001,
     SW           = 0b010,
+
+    SD           = 0b011,
 };
 
 enum class immediate_func {
@@ -130,6 +135,8 @@ string decodeInstruction(uint32_t instruction){
         case load_func::LW: return "LW";
         case load_func::LBU: return "LBU";
         case load_func::LHU: return "LHU";
+        case load_func::LWU: return "LWU";
+        case load_func::LD: return "LD";
         default: return "_";
         }
     }
@@ -139,9 +146,10 @@ string decodeInstruction(uint32_t instruction){
         case store_func::SB: return "SB";
         case store_func::SH: return "SH";
         case store_func::SW: return "SW";
+        case store_func::SD: return "SD";
         default: return "_";
         }
-    }
+    } // 0100011 00100 110 00100 01010 1111111 store 
     case opcode::IMMEDIATE:{
         immediate_func immediate = (immediate_func)((instruction & 0b111000000000000) >> 12);
         switch (immediate){

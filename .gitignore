@@ -34,3 +34,5 @@
 #outputs
 *.txt
 *.csv
+
+vmlinux.bin
